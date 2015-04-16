@@ -88,8 +88,20 @@ public class PullRequestTest {
 		} 
 		*/	
 		
-		PagedIterable<GHCommit> commit = testrepo.listCommits();
+		System.out.println("Getting commits");
 		
+		PagedIterable<GHCommit> commit = testrepo.listCommits();
+		List<GHCommit> commitList = commit.asList();
+		for (GHCommit currentCommit: commitList){
+			
+			System.out.println("Current commit: " + currentCommit.toString());
+			List<org.kohsuke.github.GHCommit.File> commitFileList = currentCommit.getFiles();
+						
+			for (GHCommit.File currentFile: commitFileList){
+				System.out.println("Commit file:" + currentFile.getLinesAdded());
+			}
+					
+		}
  
 	}
 
