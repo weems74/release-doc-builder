@@ -80,7 +80,16 @@ public class PullRequestTest {
 					
 					//Split the string on either section of the blob part of the path
 					String[] urlSections = currentFileBlobURL.split("\\/blob\\/[^\\/]*");
+					String urlPath = urlSections[urlSections.length-1];
 					System.out.println("file path =" + urlSections[urlSections.length-1]);
+
+					String [] urlSubsections = urlPath.split("/");
+					
+					//Seems a little brittle.  But it's a start. Would fail for pom.xml or .gitignore.xml 
+					//May need to get some help with the string management from Santu
+					System.out.println("folder = " + urlSubsections[1]);
+			
+					
 
 				
 				}
