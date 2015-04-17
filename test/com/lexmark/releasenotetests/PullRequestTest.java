@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.Test;
 import org.kohsuke.github.GHCommit;
@@ -18,6 +20,11 @@ import org.kohsuke.github.PagedIterable;
 
 public class PullRequestTest {
 
+	/**
+	 * Just experimenting with getting the values I want. Much of these would be separated
+	 * into different classes in real implementation
+	 */
+	
 	//Initiate classes
 	GitHub github = null;
 	
@@ -46,62 +53,63 @@ public class PullRequestTest {
 		
 		//GHRepository testrepo = github.getRepository("LexmarkWeb/LXK_Framework");
 		System.out.println("Description of testrepo:" + testrepo.getDescription());
+	
 		
-		/*		
-		 * 
-		 * PLAYING AROUND WITH PRs:
-		 * 
 		//Get a list of all the PRs that are closed on this REPO		 
 		List<GHPullRequest> pullRequestList = testrepo.getPullRequests(GHIssueState.CLOSED);
 				 
-		//Go through each closed PR and output some information
-	
-		 * In reality, I would need to manage this better--iteratively grabbing all PRs and then all commits seems dumb.
-		 * We'd need to have the Commit for the last prod-release tag, then get all the PRs since that last tag. 
-		 * So one class would get those PRs
-		 * Then you could call another class with each PR, and it could extract the files/folders affected.
-		 * 
-		 * What about commits that happen outside a PR? Shouldn't happen but could.
-		 * 
-		
-		
+		//iterate through the pull requests
 		for (GHPullRequest currentPR:pullRequestList){
 			
-			System.out.println("PR ID:" + currentPR.getId());
+			System.out.println("\rPR ID:" + currentPR.getId());
 			System.out.println("PR Title:" + currentPR.getTitle());
 			System.out.println("PR Number of Changed Files:" + currentPR.getChangedFiles());
-			System.out.println("PR Body:" + currentPR.getBody());
-			System.out.println("PR Files affected: " + currentPR.listCommits().toString());
 			
+			//get the commits in each pull request
 			PagedIterable<GHPullRequestCommitDetail> prCommits = currentPR.listCommits();
 			
+			//iterate through the commits and get the files updated
 			for (GHPullRequestCommitDetail currentCommit: prCommits.asList()){
 				String sha = currentCommit.getSha();
 				List<org.kohsuke.github.GHCommit.File> filesUpdated = testrepo.getCommit(sha).getFiles();
 				
-				System.out.println("File 0 updated: " +	filesUpdated.get(0).getFileName());
-				System.out.println("File 0 updated (bloburl):" + filesUpdated.get(0).getBlobUrl());
+				//iterate through the files updated and get the URL
+				for (org.kohsuke.github.GHCommit.File currentFile:filesUpdated){
+					
+					String currentFileBlobURL = currentFile.getBlobUrl().toString();
+					
+					//Split the string on either section of the blob part of the path
+					String[] urlSections = currentFileBlobURL.split("\\/blob\\/[^\\/]*");
+					System.out.println("file path =" + urlSections[urlSections.length-1]);
+
+				
+				}
 				
 						
 			}
 				
 		} 
-		*/	
-		
+	
+/*
+ * Playing with commits.
 		System.out.println("Getting commits");
 		
 		PagedIterable<GHCommit> commit = testrepo.listCommits();
 		List<GHCommit> commitList = commit.asList();
 		for (GHCommit currentCommit: commitList){
 			
-			System.out.println("Current commit: " + currentCommit.toString());
+			System.out.println("Current commit SHA:" + currentCommit.getSHA1());
+			System.out.println("Current commit files:" + currentCommit.getFiles());
+			//System.out.println("First file in commit:" + currentCommit.getFiles().get(0).toString());
+			
 			List<org.kohsuke.github.GHCommit.File> commitFileList = currentCommit.getFiles();
 						
 			for (GHCommit.File currentFile: commitFileList){
+				System.out.println("Commit file  :" + currentFile.getFileName());
 				System.out.println("Commit file:" + currentFile.getLinesAdded());
 			}
 					
-		}
+		}*/
  
 	}
 
